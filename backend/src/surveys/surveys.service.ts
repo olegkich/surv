@@ -3,7 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Answer } from 'src/entities/answer.entity';
 import { Question } from 'src/entities/question.entity';
 import { Survey } from 'src/entities/survey.entity';
-import { IQuestion, SurveyDto } from './dto/surveyDto';
+import { User } from 'src/entities/user.entity';
+import { IQuestion, CreateSurveyDto, FindAllSurveyDto } from './dto/surveyDto';
 
 @Injectable()
 export class SurveysService {
@@ -13,10 +14,10 @@ export class SurveysService {
     @InjectModel(Answer) private answerRepository: typeof Answer,
   ) {}
 
-  async create(surveyDto: SurveyDto) {
-    const survey = await this.surveyRepository.create(surveyDto);
+  async create(createSurveyDto: CreateSurveyDto) {
+    const survey = await this.surveyRepository.create(createSurveyDto);
 
-    surveyDto.questions.forEach(async (q: IQuestion) => {
+    createSurveyDto.questions.forEach(async (q: IQuestion) => {
       const question = await this.questionRepository.create({
         question: q.question,
         survey_id: survey.id,
@@ -36,8 +37,55 @@ export class SurveysService {
     return survey;
   }
 
-  findAll() {
-    return this.surveyRepository.findAll();
+  findAll(options: FindAllSurveyDto) {
+    if (!options.user_name && !options.survey_name) {
+      return this.surveyRepository.findAll({
+        include: [{ model: User, attributes: ['name'] }],
+        attributes: ['id', 'name'],
+      });
+    }
+
+    if (options.user_name) {
+      return this.surveyRepository.findAll({
+        include: [
+          {
+            model: User,
+            required: true,
+            where: {
+              name: options.user_name,
+            },
+            attributes: ['name'],
+          },
+        ],
+        attributes: ['id', 'name'],
+      });
+    }
+
+    if (options.survey_name) {
+      return this.surveyRepository.findAll({
+        where: { name: options.survey_name },
+        attributes: ['id', 'name'],
+      });
+    }
+
+    if (options.survey_name && options.user_name) {
+      return this.surveyRepository.findAll({
+        include: [
+          {
+            model: User,
+            where: {
+              name: options.user_name,
+            },
+            required: true,
+            attributes: ['name'],
+          },
+        ],
+        where: {
+          name: options.survey_name,
+        },
+        attributes: ['name', 'id'],
+      });
+    }
   }
 
   findOne(id: number) {

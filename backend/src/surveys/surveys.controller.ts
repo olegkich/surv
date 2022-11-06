@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { SurveysService } from './surveys.service';
-import { SurveyDto } from './dto/surveyDto';
+import { CreateSurveyDto, FindAllSurveyDto } from './dto/surveyDto';
 import { User } from 'src/shared/user-auth.decorator';
 import { JwtUserGuard } from 'src/users/auth.guard';
 
@@ -18,14 +18,14 @@ export class SurveysController {
 
   @UseGuards(JwtUserGuard)
   @Post()
-  create(@Body() surveyDto: SurveyDto, @User() user: any) {
-    surveyDto.user_id = user.id;
-    return this.surveysService.create(surveyDto);
+  create(@Body() createSurveyDto: CreateSurveyDto, @User() user: any) {
+    createSurveyDto.user_id = user.id;
+    return this.surveysService.create(createSurveyDto);
   }
 
   @Get()
-  findAll() {
-    return this.surveysService.findAll();
+  findAll(@Body() findAllSurveyDto: FindAllSurveyDto) {
+    return this.surveysService.findAll(findAllSurveyDto);
   }
 
   @Get(':id')
