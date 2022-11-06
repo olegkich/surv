@@ -7,7 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { Question } from './question.entity';
-import { User } from './user.entity';
+import { Survey } from './survey.entity';
 
 interface AnswerCreationAttrs {
   answer: string;

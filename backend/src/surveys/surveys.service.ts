@@ -23,7 +23,6 @@ export class SurveysService {
         survey_id: survey.id,
       });
 
-      console.log(q.answers);
       q.answers.forEach(async (answer: string) => {
         console.log(answer, question.id);
 
@@ -37,39 +36,9 @@ export class SurveysService {
     return survey;
   }
 
-  findAll(options: FindAllSurveyDto) {
-    if (!options.user_name && !options.survey_name) {
-      return this.surveyRepository.findAll({
-        include: [{ model: User, attributes: ['name'] }],
-        attributes: ['id', 'name'],
-      });
-    }
-
-    if (options.user_name) {
-      return this.surveyRepository.findAll({
-        include: [
-          {
-            model: User,
-            required: true,
-            where: {
-              name: options.user_name,
-            },
-            attributes: ['name'],
-          },
-        ],
-        attributes: ['id', 'name'],
-      });
-    }
-
-    if (options.survey_name) {
-      return this.surveyRepository.findAll({
-        where: { name: options.survey_name },
-        attributes: ['id', 'name'],
-      });
-    }
-
+  async findAll(options: FindAllSurveyDto) {
     if (options.survey_name && options.user_name) {
-      return this.surveyRepository.findAll({
+      return await this.surveyRepository.findAll({
         include: [
           {
             model: User,
@@ -86,18 +55,56 @@ export class SurveysService {
         attributes: ['name', 'id'],
       });
     }
-  }
 
-  findOne(id: number) {
-    return this.surveyRepository.findOne({
-      where: {
-        id,
-      },
-      include: [Question, Answer],
+    if (options.user_name) {
+      return await this.surveyRepository.findAll({
+        include: [
+          {
+            model: User,
+            required: true,
+            where: {
+              name: options.user_name,
+            },
+            attributes: ['name'],
+          },
+        ],
+        attributes: ['id', 'name'],
+      });
+    }
+
+    if (options.survey_name) {
+      return await this.surveyRepository.findAll({
+        where: { name: options.survey_name },
+        attributes: ['id', 'name'],
+      });
+    }
+
+    return await this.surveyRepository.findAll({
+      include: [{ model: User, attributes: ['name'] }],
+      attributes: ['id', 'name'],
     });
   }
 
+  async findOne(id: number) {
+    const survey = await this.surveyRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    const questions = await this.questionRepository.findAll({
+      where: { survey_id: survey.id },
+      include: { model: Answer },
+    });
+
+    return {
+      survey_name: survey.name,
+      survey_id: survey.id,
+      questions,
+    };
+  }
+
   remove(id: number) {
-    return `This action removes a #${id} survey`;
+    return this.surveyRepository.destroy({ where: { id }, cascade: true });
   }
 }

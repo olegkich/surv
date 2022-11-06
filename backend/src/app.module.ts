@@ -5,6 +5,8 @@ import { SurveysModule } from './surveys/surveys.module';
 import { Survey } from './entities/survey.entity';
 import { User } from './entities/user.entity';
 import * as dotenv from 'dotenv';
+import { Question } from './entities/question.entity';
+import { Answer } from './entities/answer.entity';
 
 dotenv.config();
 
@@ -19,7 +21,7 @@ dotenv.config();
       database: process.env.DB_NAME,
       autoLoadModels: true,
       synchronize: true,
-      models: [User, Survey],
+      models: [User, Survey, Question, Answer],
     }),
     UsersModule,
     SurveysModule,

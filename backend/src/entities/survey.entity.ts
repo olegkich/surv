@@ -3,9 +3,13 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
+  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
+import { Answer } from './answer.entity';
+import { Question } from './question.entity';
 import { User } from './user.entity';
 
 interface SurveyCreationAttrs {
@@ -30,4 +34,7 @@ export class Survey extends Model<Survey, SurveyCreationAttrs> {
 
   @ForeignKey(() => User)
   user_id: number;
+
+  @HasMany(() => Question)
+  question: Question[];
 }
