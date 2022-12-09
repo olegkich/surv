@@ -4,11 +4,9 @@ import {
   DataType,
   ForeignKey,
   HasMany,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Answer } from './answer.entity';
 import { Question } from './question.entity';
 import { User } from './user.entity';
 

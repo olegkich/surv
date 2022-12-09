@@ -1,7 +1,24 @@
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsNotEmpty,
+  IsNumber,
+  ValidateNested,
+} from 'class-validator';
+
 export class CreateSurveyDto {
+  @IsNotEmpty()
   name: string;
-  questions: IQuestion[];
-  user_id?: number;
+
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  @ArrayMaxSize(15)
+  @Type(() => QuestionType)
+  questions: QuestionType[];
+
+  @IsNumber()
+  user_id: number;
 }
 
 export class FindAllSurveyDto {
@@ -9,7 +26,13 @@ export class FindAllSurveyDto {
   user_name?: string;
 }
 
-export interface IQuestion {
+export class QuestionType {
   question: string;
-  answers: string[];
+  options: string[];
+}
+
+export class ReturnSurveysDto {
+  survey_name: string;
+  survey_id: number;
+  user_id: number;
 }

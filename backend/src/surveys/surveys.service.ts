@@ -1,33 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Answer } from 'src/entities/answer.entity';
+import { Option } from 'src/entities/option.entity';
 import { Question } from 'src/entities/question.entity';
 import { Survey } from 'src/entities/survey.entity';
 import { User } from 'src/entities/user.entity';
-import { IQuestion, CreateSurveyDto, FindAllSurveyDto } from './dto/surveyDto';
+import {
+  QuestionType,
+  CreateSurveyDto,
+  FindAllSurveyDto,
+} from './dto/surveyDto';
 
 @Injectable()
 export class SurveysService {
   constructor(
     @InjectModel(Survey) private surveyRepository: typeof Survey,
     @InjectModel(Question) private questionRepository: typeof Question,
-    @InjectModel(Answer) private answerRepository: typeof Answer,
+    @InjectModel(Option) private optionRepository: typeof Option,
   ) {}
 
   async create(createSurveyDto: CreateSurveyDto) {
     const survey = await this.surveyRepository.create(createSurveyDto);
 
-    createSurveyDto.questions.forEach(async (q: IQuestion) => {
+    createSurveyDto.questions.forEach(async (q: QuestionType) => {
       const question = await this.questionRepository.create({
         question: q.question,
         survey_id: survey.id,
       });
 
-      q.answers.forEach(async (answer: string) => {
-        console.log(answer, question.id);
-
-        await this.answerRepository.create({
-          answer,
+      q.options.forEach(async (option: string) => {
+        await this.optionRepository.create({
+          option,
           question_id: question.id,
         });
       });
@@ -94,7 +96,7 @@ export class SurveysService {
 
     const questions = await this.questionRepository.findAll({
       where: { survey_id: survey.id },
-      include: { model: Answer },
+      include: { model: Option },
     });
 
     return {

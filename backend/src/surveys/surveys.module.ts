@@ -4,11 +4,11 @@ import { SurveysController } from './surveys.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Question } from 'src/entities/question.entity';
 import { Survey } from 'src/entities/survey.entity';
-import { Answer } from 'src/entities/answer.entity';
+import { Option } from 'src/entities/option.entity';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Survey, Answer, Question]), JwtModule],
+  imports: [SequelizeModule.forFeature([Survey, Option, Question]), JwtModule],
   controllers: [SurveysController],
   providers: [SurveysService],
 })

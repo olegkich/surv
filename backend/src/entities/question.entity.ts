@@ -7,9 +7,8 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Answer } from './answer.entity';
+import { Option } from './option.entity';
 import { Survey } from './survey.entity';
-import { User } from './user.entity';
 
 interface QuestionCreationAttrs {
   question: string;
@@ -35,6 +34,6 @@ export class Question extends Model<Question, QuestionCreationAttrs> {
   @ForeignKey(() => Survey)
   survey_id: number;
 
-  @HasMany(() => Answer)
-  answers: Answer[];
+  @HasMany(() => Option)
+  options: Option[];
 }
